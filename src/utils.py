@@ -1,3 +1,4 @@
+from sklearn.model_selection import GridSearchCV
 import os 
 import sys 
 
@@ -5,6 +6,7 @@ import numpy as np
 import pandas as pd 
 import dill
 from src.exception import CustomException
+from src.logger import logging
 from sklearn.metrics import r2_score
 
 def save_object(file_path: str, obj):
@@ -19,22 +21,27 @@ def save_object(file_path: str, obj):
         raise CustomException(e,sys)
 
 
-def evaluate_model(X_train,y_train,X_test,y_test,models:dict):
+def evaluate_model(X_train,y_train,X_test,y_test,models:dict,param):
     try:
         report = {}
-
+        logging.info("Starting Model Training")
         for i in range(len(list(models.values()))):
             model = list(models.values())[i]
+            params = param[list(models.keys())[i]]
 
-            train_model = model.fit(X_train,y_train)
+            gs = GridSearchCV(estimator=model, param_grid=params, cv=3)
+            gs.fit(X_train, y_train)
 
-            y_pred = train_model.predict(X_test)
+            model.set_params(**gs.best_params_)
+            model.fit(X_train, y_train)
+
+            y_pred = model.predict(X_test)
 
             test_score = r2_score(y_test,y_pred)
 
 
             report[list(models.keys())[i]] = test_score
-
+        logging.info("Model training completed")
         return report 
 
     except Exception as e:
