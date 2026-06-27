@@ -1,4 +1,3 @@
-from pandas.core.arrays import categorical
 import os
 import sys
 import numpy as np 
