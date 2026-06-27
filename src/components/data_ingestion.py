@@ -1,3 +1,4 @@
+from src.components.data_transformation import DataTransformation
 import os 
 import sys 
 from src.exception import CustomException
@@ -45,4 +46,7 @@ class DataIngestion:
 if __name__ == "__main__" :
     obj = DataIngestion()
     train_path,test_path = obj.inisiate_data_ingestion()
-    
+
+    data_transformation = DataTransformation()
+    train_arr, test_arr, _ = data_transformation.initiate_data_transformation(train_path,test_path) 
+    print(test_arr)
